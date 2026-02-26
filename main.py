@@ -8,12 +8,29 @@ from passlib.context import CryptContext
 import os
 from fastapi.staticfiles import StaticFiles
 from fastapi import Response 
+from sqlalchemy import Table, Column, Integer, String, MetaData, create_engine
+from sqlalchemy import insert, select
 
 
 # Этот код найдет папку templates, где бы ни был запущен скрипт
 base_dir = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(base_dir, "templates"))
 app= FastAPI()
+
+
+DATABASE_URL = "sqlite:///./users.db"
+metadata = MetaData()
+engine = create_engine(DATABASE_URL)
+
+users = Table(
+    "users",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("username", String, unique=True, index=True),
+    Column("hashed_password", String),
+)
+
+metadata.create_all(engine)  # создаёт файл users.db и таблицу
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -24,99 +41,46 @@ security = HTTPBearer()
 SECRET_KEY = "supersecretkey123"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 5
+##################Password#####################
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-def verify_password(password: str, hashed_password: str):
-    return pwd_context.verify(password, hashed_password)
-
-def hash_password(password: str):
+def hash_password(password):
     return pwd_context.hash(password)
 
-users_db = {
-  "max": {
-      "username": "max",
-      "hashed_password": "..."
-  }
-}
+def verify_password(password, hashed):
+    return pwd_context.verify(password, hashed)
+##############################################################
+# Регистрация/логин в bd sqlite
+def register_user(username: str, password: str):
+    hashed = hash_password(password)
+    query = insert(users).values(username=username, hashed_password=hashed)
+    conn = engine.connect()
+    try:
+        conn.execute(query)
+        conn.commit()
+    except Exception:
+        raise Exception("User already exists")
+    finally:
+        conn.close()
 
+def authenticate_user(username: str, password: str):
+    conn = engine.connect()
+    query = select(users).where(users.c.username == username)
+    result = conn.execute(query).fetchone()
+    conn.close()
+    if not result:
+        return False
+    if not verify_password(password, result.hashed_password):
+        return False
+    return result.username
+
+#############################JWT############################
 def create_access_token(username: str):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": username, "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-    payload = {
-        "sub": username,
-        "exp": expire
-    }
-
-    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-@app.get('/register')
-def get_register(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
-
-@app.post("/register")
-def register(username: str = Form(...), password: str = Form(...)):
-    
-    if username in users_db:
-        raise HTTPException(status_code=400, detail="User already exists")
-    
-    pw_num = ('0123456789')
-
-    if len(password) >= 8 and any(char.isdigit() for char in pw_num):           #Пистая проверка на надежность пароля 
-
-
-        hashed = hash_password(password)
-
-        users_db[username] = {
-            "username": username,
-            "hashed_password": hashed
-        }
-
-        return RedirectResponse(url="/login")   
-    
-    elif len(password) < 8 or any(char.isfigit() for char in pw_num): 
-        return {"messege" : "Password must have num and more then 8 len"}
-
-
-@app.get('/')
-def index_nothing(request: Request):
-    return templates.TemplateResponse('index.html', {'request' : request})
-
-@app.get('/login')
-def login_get(request: Request):
-    return templates.TemplateResponse('login.html', {"request":request})
-
-@app.post("/login")
-def login(username: str = Form(...), password: str = Form(...)):
-    user = users_db.get(username)
-    if not user or not verify_password(password, user["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    access_token = create_access_token(username)
-
-    # Создаём redirect
-    response = RedirectResponse(url="/profile", status_code=302)
-
-    # Ставим cookie на этот redirect
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        samesite="lax",
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES*60
-    )
-
-    return response
-
-@app.get('/support')
-def support(request: Request):
-    return {"messege": {"Хах какая нaхуй поддержка? Ты в это поверил???"}}
-
-@app.get("/about")
-def about(request: Request):
-    return templates.TemplateResponse('about.html', {'request': request})
-
-security = HTTPBearer()
+#####################################################################
 
 def get_current_user(access_token: str = Cookie(None)):
     """
@@ -138,15 +102,90 @@ def get_current_user(access_token: str = Cookie(None)):
     except JWTError:
         raise HTTPException(status_code=401, detail="Token expired or invalid")
 
-from fastapi import Request, Depends
-from fastapi.templating import Jinja2Templates
+@app.get('/register')
+def get_register(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
-templates = Jinja2Templates(directory="templates")
+@app.post("/register")
+def register(username: str = Form(...), password: str = Form(...)):
+    
+    conn = engine.connect()
+    
+    query = select(users).where(users.c.username == username)
+    existing_user = conn.execute(query).fetchone()
 
-@app.get("/profile")
+    if existing_user:
+        conn.close()
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    pw_num = ('0123456789')
+
+    if len(password) < 8 or not any(char.isfigit() for char in pw_num): 
+        conn.close()
+        return {"messege" : "Password must have num and more then 8 len"}
+    
+    hashed = hash_password(password)
+
+    insert_query = users.insert().values(
+        username=username,
+        hashed_password=hashed
+    )
+
+    conn.execute(insert_query)
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse(url="/login", status_code=302)
+
+
+@app.get('/')
+def index_nothing(request: Request):
+    return templates.TemplateResponse('index.html', {'request' : request})
+
+@app.get('/login')
+def login_get(request: Request):
+    return templates.TemplateResponse('login.html', {"request":request})
+
+@app.post("/login")
+def login(username: str = Form(...), password: str = Form(...)):
+    user = authenticate_user(username, password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    access_token = create_access_token(user)
+                         # Создаём redirect
+    response = RedirectResponse(url="/profile", status_code=302)
+
+            # Ставим cookie на этот redirect
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES*60
+    )
+    return response
+
+@app.get('/support')
+def support(request: Request):
+    return {"messege": {"Хах какая нaхуй поддержка? Ты в это поверил???"}}
+
+@app.get("/about")
+def about(request: Request):
+    return templates.TemplateResponse('about.html', {'request': request})
+
+
+@app.get("/profile", response_class=HTMLResponse)
 def profile(request: Request, current_user: str = Depends(get_current_user)):
     return templates.TemplateResponse(
         "profile.html",
-        {"request": request, "username": current_user}
+        {
+            "request": request,
+            "username": current_user
+        }
     )
+
+
+
+
 

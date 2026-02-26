@@ -1,0 +1,28 @@
+# ---------------- Python ----------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+
+# ---------------- Virtualenv ----------------
+venv/
+env/
+.venv/
+ENV/
+*.env
+
+# ---------------- IDE ----------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ---------------- OS ----------------
+.DS_Store
+Thumbs.db
+
+# ---------------- Python packaging ----------------
+*.egg-info/
+dist/
+build/
