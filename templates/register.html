@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Registr</title>
+    <style>
+        :root {
+            --bg-color: #050a14; /* Еще более глубокий синий для фона */
+            --glass-bg: rgba(0, 0, 0, 0.6); /* Темное стекло */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #007aff; 
+            --text-color: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            /* Путь к картинке */
+            background-image: linear-gradient(rgba(5, 10, 20, 0.4), rgba(5, 10, 20, 0.4)), 
+                            url("/static/images/background.jpg");
+            
+            /* Настройки отображения */
+            background-size: cover;         /* Растянуть на весь экран */
+            background-position: center;    /* Центрировать */
+            background-attachment: fixed;   /* Чтобы фон не скроллился */
+            height: 100vh;
+            display: flex;
+            justify-content: flex-start;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* Декоративные свечения на фоне */
+        .blur-spot {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 122, 255, 0.15);
+            filter: blur(120px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .spot-1 { top: -100px; right: -100px; }
+        .spot-2 { bottom: -150px; left: 20%; background: rgba(88, 86, 214, 0.1); }
+
+        /* Основная панель регистрации "сверху до низу" */
+        .register-panel {
+            width: 100%;
+            max-width: 450px; /* Ширина боковой панели */
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px); /* Усиленное размытие */
+            -webkit-backdrop-filter: blur(40px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 60px;
+            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.8px;
+        }
+
+        p.subtitle {
+            font-size: 15px;
+            opacity: 0.5;
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2);
+        }
+
+        .btn-register:hover {
+            background: #0084ff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.3);
+        }
+
+        .footer-link {
+            margin-top: 30px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .footer-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Адаптивность для мобилок */
+        @media (max-width: 480px) {
+            .register-panel {
+                padding: 0 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blur-spot spot-1"></div>
+    <div class="blur-spot spot-2"></div>
+
+    <aside class="register-panel">
+        <h2>Регистрация</h2>
+        <p class="subtitle">Добро пожаловать. Введите данные для создания аккаунта.</p>
+        
+        <form action="/register" method="post">
+            <div class="input-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" placeholder="Придумайте логин" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Ваш пароль" required>
+            </div>
+
+            <button type="submit" class="btn-register">Создать профиль</button>
+        </form>
+
+        <p class="footer-link">
+            Уже есть аккаунт? <a href="/login">Войти в систему</a>
+        </p>
+    </aside>
+
+</body>
+</html>

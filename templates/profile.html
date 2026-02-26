@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль | Profile</title>
+    <style>
+        :root {
+            --bg-color: #050a14;
+            --glass-bg: rgba(0, 0, 0, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #007aff; 
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(rgba(5, 10, 20, 0.5), rgba(5, 10, 20, 0.5)), 
+                              url("/static/images/background.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Верхняя шторка (Navbar) */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .nav-links a.active {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        /* Контент профиля */
+        .profile-container {
+            margin-top: 120px; /* Отступ от навигации */
+            width: 90%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Левая карточка пользователя */
+        .profile-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            height: fit-content;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent-color), #5856d6);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-card h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .profile-card p {
+            color: var(--secondary-text);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .btn-edit {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-edit:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Правая часть с информацией (Аналитика) */
+        .info-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .info-panel h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .stat-item label {
+            display: block;
+            color: var(--secondary-text);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-item span {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+                margin-top: 80px;
+            }
+            .nav-links { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/about">О нас</a>
+            <a href="/analytics">Аналитика</a>
+            <a href="/profile" class="active">Профиль</a>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <aside class="profile-card">
+            <div class="avatar">U</div>
+            <h2>Имя Пользователя</h2>
+            <p>Статус: В сети</p>
+            <a href="#" class="btn-edit">Настройки</a>
+        </aside>
+
+        <main class="info-panel">
+            <h3>Ваша аналитика</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <label>Активность</label>
+                    <span>85%</span>
+                </div>
+                <div class="stat-item">
+                    <label>Проекты</label>
+                    <span>12</span>
+                </div>
+                <div class="stat-item">
+                    <label>Время сессии</label>
+                    <span>4ч 12м</span>
+                </div>
+                <div class="stat-item">
+                    <label>Рейтинг</label>
+                    <span>4.9</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">Последние действия</h3>
+            <p style="color: var(--secondary-text); font-size: 14px;">
+                Здесь будет отображаться список ваших последних операций в системе FastAPI.
+            </p>
+        </main>
+    </div>
+
+</body>
+</html>

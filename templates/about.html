@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обо мне | Dark Glass Portfolio</title>
+    <style>
+        :root {
+            --bg-color: #050a14;
+            --glass-bg: rgba(0, 0, 0, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #007aff; 
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(rgba(5, 10, 20, 0.6), rgba(5, 10, 20, 0.6)), 
+                              url("/static/images/background.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-y: auto; /* Разрешаем прокрутку */
+        }
+
+        /* Навигация */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 20px;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { opacity: 1; }
+
+        /* Основной контейнер */
+        .content-wrapper {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+        }
+
+        /* Секции */
+        section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 48px; letter-spacing: -2px; margin-bottom: 20px; }
+        h2 { font-size: 28px; margin-bottom: 20px; color: var(--accent-color); }
+        p { margin-bottom: 20px; font-size: 18px; color: var(--secondary-text); }
+
+        .highlight { color: #ffffff; font-weight: 500; }
+
+        /* Специфические блоки */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .stat-card div:first-child {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .stat-card div:last-child {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        /* Декор */
+        .accent-line {
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/">Главная</a>
+            <a href="/about" class="active">Обо мне</a>
+            <a href="/profile">Профиль</a>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        
+        <section>
+            <div class="accent-line"></div>
+            <h1>Мне 18, и я создаю <br><span style="color: var(--accent-color)">двигатели</span> для веба.</h1>
+            <p>Я Backend-разработчик с опытом более <span class="highlight">одного года</span>. Пока мои сверстники спорили о выборе универа, я разбирался в том, как устроена архитектура высоконагруженных систем и почему Python — это не только про простоту, но и про огромную мощь.</p>
+        </section>
+
+        <section style="animation-delay: 0.2s;">
+            <h2>Мой стек и путь</h2>
+            <p>За последний год я прошел путь от простых скриптов до проектирования API на <span class="highlight">FastAPI</span>. Моя работа — это всё, что происходит «под капотом»: база данных, серверная логика, безопасность и интеграции.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>18</div>
+                    <div>Лет жизни</div>
+                </div>
+                <div class="stat-card">
+                    <div>1+</div>
+                    <div>Год в IT</div>
+                </div>
+                <div class="stat-card">
+                    <div>Много</div>
+                    <div>Кода написано</div>
+                </div>
+            </div>
+        </section>
+
+        <section style="animation-delay: 0.4s;">
+            <h2>Почему Бэкенд?</h2>
+            <p>Фронтенд — это лицо приложения, а бэкенд — это его <span class="highlight">интеллект</span>. Мне нравится решать задачи, которые не видны глазу, но от которых зависит всё.</p>
+            
+            <p>Вот пара фактов о бэкенде, которые меня драйвят:</p>
+            <ul style="list-style: none; color: var(--secondary-text); font-size: 18px;">
+                <li style="margin-bottom: 15px;">⚡️ <span class="highlight">Миллисекунды стоят денег.</span> Оптимизация запроса в БД может спасти проект от краха при наплыве пользователей.</li>
+                <li style="margin-bottom: 15px;">🛡 <span class="highlight">Безопасность — это база.</span> Хеширование, JWT-токены, защита от SQL-инъекций — это мой ежедневный вайб.</li>
+                <li style="margin-bottom: 15px;">🐳 <span class="highlight">Контейнеризация.</span> Docker превращает «у меня на компе работает» в «это работает везде».</li>
+            </ul>
+        </section>
+
+        <section style="animation-delay: 0.6s; margin-bottom: 100px;">
+            <h2>Что дальше?</h2>
+            <p>Я не планирую останавливаться. В планах — углубление в микросервисную архитектуру и изучение Go для еще более быстрых решений. Если тебе нужен надежный бэкенд, который не упадет при первом же шорохе — ты знаешь, к кому обратиться.</p>
+            <p style="text-align: center; margin-top: 40px;">
+                <a href="https://t.me/pepsi_mm" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Пиши мне в тг =></a>
+            </p>
+        </section>
+
+    </div>
+
+</body>
+</html>

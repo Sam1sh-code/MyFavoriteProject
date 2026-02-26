@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная |  Hub</title>
+    <style>
+        :root {
+            --bg-color: #050a14;
+            --glass-bg: rgba(0, 0, 0, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #007aff; 
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            /* Твой фон, такой же как на остальных страницах */
+            background-image: linear-gradient(rgba(5, 10, 20, 0.5), rgba(5, 10, 20, 0.5)), 
+                              url("/static/images/backgroundindex.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Центрируем контент */
+            overflow: hidden;
+        }
+
+        /* Верхняя шторка (для навигации между разделами) */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 20px;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { opacity: 1; }
+
+        /* Центральный хаб */
+        .hub-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 60px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -1.5px;
+        }
+
+        p.description {
+            color: var(--secondary-text);
+            font-size: 18px;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        /* Кнопки выбора */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            display: block;
+            padding: 18px;
+            border-radius: 16px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #0084ff;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/about">О проекте</a>
+            <a href="/support">Поддержка</a>
+        </div>
+    </nav>
+
+    <main class="hub-container">
+        <h1>Добро пожаловать мой господин!</h1>
+        <p class="description">Управляйте своими данными и аналитикой в едином защищенном пространстве бла бла бла бла... Скажи бисмиллях</p>
+        
+        <div class="button-group">
+            <a href="/login" class="btn btn-primary">Войти в систему</a>
+            <a href="/register" class="btn btn-secondary">Создать новый аккаунт</a>
+        </div>
+
+        <p class="footer-note">FastAPI Framework Юсуф привет! Apple Design Style</p>
+    </main>
+
+</body>
+</html>
