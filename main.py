@@ -101,6 +101,25 @@ def get_current_user(access_token: str = Cookie(None)):
 
     except JWTError:
         raise HTTPException(status_code=401, detail="Token expired or invalid")
+#####################################################get_user_from_db
+def get_user_from_db(username: str):
+    conn = engine.connect()
+
+    query = select(users).where(users.c.username == username)
+    result = conn.execute(query).fetchone()
+
+    conn.close()
+
+    if result:
+        return {
+            "id": result.id,
+            "username": result.username,
+            "hashed_password": result.hashed_password
+        }
+
+    return None
+
+#######################################################
 
 @app.get('/register')
 def get_register(request: Request):
@@ -120,7 +139,7 @@ def register(username: str = Form(...), password: str = Form(...)):
     
     pw_num = ('0123456789')
 
-    if len(password) < 8 or not any(char.isfigit() for char in pw_num): 
+    if len(password) < 8 or not any(char.isdigit() for char in pw_num): 
         conn.close()
         return {"messege" : "Password must have num and more then 8 len"}
     
@@ -147,13 +166,15 @@ def login_get(request: Request):
     return templates.TemplateResponse('login.html', {"request":request})
 
 @app.post("/login")
-def login(username: str = Form(...), password: str = Form(...)):
+def login(username: str = Form(...), password: str = Form(...)): 
+
     user = authenticate_user(username, password)
+
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Probobly your password or username wrong")
     
     access_token = create_access_token(user)
-                         # Создаём redirect
+                        # Создаём redirect
     response = RedirectResponse(url="/profile", status_code=302)
 
             # Ставим cookie на этот redirect
@@ -185,6 +206,32 @@ def profile(request: Request, current_user: str = Depends(get_current_user)):
         }
     )
 
+@app.get("/profile", response_class=HTMLResponse)
+def profile(request: Request, current_user: str = Depends(get_current_user)):
+    # Тут ты можешь достать данные пользователя из БД
+    # Пока сделаем пример
+
+    user_data = get_user_from_db(current_user)
+
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    my_user_info = {
+        "username": "Admin_FastAPI",
+        "status": "Разрабатываю проект"
+    }
+    return templates.TemplateResponse("profile.html", {
+        "request": request, 
+        "user": my_user_info # Вот этот ключ 'user' мы используем в HTML
+    })
+
+    # return templates.TemplateResponse(
+    #     "profile.html",
+    #     {
+    #         "request": request,
+    #         "user": user_data
+    #     }
+    # )
 
 
 

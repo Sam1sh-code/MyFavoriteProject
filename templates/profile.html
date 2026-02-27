@@ -204,9 +204,9 @@
 
     <div class="profile-container">
         <aside class="profile-card">
-            <div class="avatar">U</div>
-            <h2>Имя Пользователя</h2>
-            <p>Статус: В сети</p>
+            <div class="avatar">{{ user.username[0] if user else 'U' }}</div>
+            <h2>{{ user.username if user else 'Гость' }}</h2>
+            <p>Статус: {{ user.status if user else 'В сети' }}</p>
             <a href="#" class="btn-edit">Настройки</a>
         </aside>
 
