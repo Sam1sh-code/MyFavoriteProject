@@ -26,4 +26,4 @@ def about(request: Request):
 
 @router.get("/support")
 def support():
-    return {"message": "Support is not implemented yet 🙂"}
+    return {"message": "Какая нахуй поддержка хах"}

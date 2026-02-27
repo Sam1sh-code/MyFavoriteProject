@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитика Криптовалют | Dark Glass</title>
+    <style>
+        :root {
+            --bg-color: #050a14;
+            --glass-bg: rgba(0, 0, 0, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-btc: #f7931a; /* Оранжевый Bitcoin */
+            --accent-eth: #627eea; /* Синий Ethereum */
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(rgba(5, 10, 20, 0.6), rgba(5, 10, 20, 0.6)), 
+                              url("/static/images/background.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Навигация */
+        .navbar {
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 20px;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { opacity: 1; }
+
+        /* Контейнер контента */
+        .analytics-container {
+            margin-top: 100px;
+            margin-bottom: 50px;
+            width: 90%;
+            max-width: 1100px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-section h1 { font-size: 36px; letter-spacing: -1px; }
+        .header-section p { color: var(--secondary-text); margin-top: 10px; }
+        .binance-badge {
+            display: inline-block;
+            background: rgba(243, 186, 47, 0.1);
+            color: #f3ba2f;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 15px;
+            border: 1px solid rgba(243, 186, 47, 0.2);
+        }
+
+        /* Сетка графиков */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .chart-card:hover { transform: translateY(-5px); }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Место под график Matplotlib */
+        .plot-area {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-text);
+            font-size: 14px;
+            border: 1px dashed var(--glass-border);
+            overflow: hidden;
+        }
+
+        .plot-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Секция инфо */
+        .info-section {
+            margin-top: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .info-section h2 { margin-bottom: 15px; font-size: 22px; }
+        .info-section p { color: var(--secondary-text); font-size: 16px; line-height: 1.6; }
+
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/">Главная</a>
+            <a href="/analitic" class="active">Аналитика</a>
+            <a href="/profile">Профиль</a>
+        </div>
+    </nav>
+
+    <div class="analytics-container">
+        <header class="header-section">
+            <h1>Мониторинг рынка</h1>
+            <p>Актуальные данные котировок в реальном времени</p>
+            <div class="binance-badge">Данные предоставлены официальным API Binance</div>
+        </header>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <div class="dot" style="background: var(--accent-btc);"></div>
+                    Bitcoin / USDT
+                </div>
+                <div class="plot-area">
+                    Здесь будет график Matplotlib (BTC)
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">
+                    <div class="dot" style="background: var(--accent-eth);"></div>
+                    Ethereum / USDT
+                </div>
+                <div class="plot-area">
+                    Здесь будет график Matplotlib (ETH)
+                </div>
+            </div>
+        </div>
+
+        <section class="info-section">
+            <h2>О Биткоине</h2>
+            <p>
+                Биткоин — это первая и самая известная криптовалюта, работающая на базе технологии блокчейн. 
+                Она представляет собой децентрализованную цифровую валюту, которая позволяет проводить транзакции без участия посредников, таких как банки.
+            </p>
+            <p style="margin-top: 15px;">
+                Многие эксперты называют его «цифровым золотом» из-за ограниченной эмиссии в 21 миллион монет. 
+                Курс биткоина является основным индикатором здоровья всего крипторынка.
+            </p>
+        </section>
+    </div>
+
+</body>
+</html>
