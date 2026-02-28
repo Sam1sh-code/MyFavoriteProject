@@ -132,6 +132,7 @@
             aspect-ratio: 16 / 9;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -189,7 +190,7 @@
                     Bitcoin / USDT
                 </div>
                 <div class="plot-area">
-                    Здесь будет график Matplotlib (BTC)
+                    <img src="/static/plots/btc_chart.png?{{ range(1, 9999) | random }}" alt="BTC Plot">
                 </div>
             </div>
 
@@ -199,7 +200,7 @@
                     Ethereum / USDT
                 </div>
                 <div class="plot-area">
-                    Здесь будет график Matplotlib (ETH)
+                    <img src="/static/plots/eth_chart.png?{{ range(1, 9999) | random }}" alt="ETH Plot">
                 </div>
             </div>
         </div>
