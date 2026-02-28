@@ -147,7 +147,30 @@
             height: 100%;
             object-fit: contain;
         }
+        .period-switcher {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
 
+        .period-switcher a {
+            padding: 8px 18px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .period-switcher a:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .period-switcher a.active {
+            background: #007aff;
+        }
         /* Секция инфо */
         .info-section {
             margin-top: 40px;
@@ -182,7 +205,11 @@
             <p>Актуальные данные котировок в реальном времени</p>
             <div class="binance-badge">Данные предоставлены официальным API Binance</div>
         </header>
-
+        <div class="period-switcher">
+            <a href="/analytics?days=7">7D</a>
+            <a href="/analytics?days=30">30D</a>
+            <a href="/analytics?days=90">90D</a>
+        </div>
         <div class="charts-grid">
             <div class="chart-card">
                 <div class="chart-title">

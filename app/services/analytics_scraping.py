@@ -11,11 +11,12 @@ import os
 
 templates = Jinja2Templates(directory="templates")
 
-def generate_crypto_plot(coin_id: str, filename: str):
+def generate_crypto_plot(coin_id: str, filename: str, days: int):
     # 1. Парсинг данных
     link = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-    params = {"vs_currency": "usd", "days": 7, "interval": "daily"}
-    
+    params = {"vs_currency": "usd", "days": days, "interval": "daily"}
+    path = f"static/plots/{filename}"
+
     try:
         response = requests.get(link, params=params)
         data = response.json()
@@ -40,7 +41,7 @@ def generate_crypto_plot(coin_id: str, filename: str):
         plt.tight_layout()
         plt.savefig(path, transparent=True, bbox_inches='tight')
 
-        plt.title(f"{coin_id.capitalize()} Price (7 Days)", color='white', pad=20)
+        plt.title(f"{coin_id.capitalize()} Price ({days} Days)")
         plt.xticks(rotation=45)
         plt.tight_layout()
 
@@ -48,8 +49,7 @@ def generate_crypto_plot(coin_id: str, filename: str):
         os.makedirs("static/plots", exist_ok=True)
         
         # 3. Сохранение
-        path = f"static/plots/{filename}"
-        plt.savefig(path, transparent=True)
+        plt.savefig(path, transparent=True, bbox_inches="tight")
         plt.close() # Важно для очистки памяти
         return True
     except Exception as e:
