@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/png" href="/static/images/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аналитика Криптовалют | Dark Glass</title>
@@ -149,9 +150,33 @@
         }
         .period-switcher {
             display: flex;
-            gap: 15px;
+            gap: 12px;               /* расстояние между кнопками */
+            justify-content: center;  /* центрируем */
             margin-bottom: 25px;
-            justify-content: center;
+        }
+
+        .period-btn {
+            padding: 10px 22px;                /* увеличенные кнопки */
+            border-radius: 25px;               /* круглые края */
+            background: linear-gradient(135deg, #007aff, #00d4ff); /* градиент */
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .period-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, #005fcc, #00b8ff); /* немного темнее */
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #ff9a00, #ff3d00);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
         }
 
         .period-switcher a {
@@ -170,6 +195,26 @@
 
         .period-switcher a.active {
             background: #007aff;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .export-buttons button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: #007aff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .export-buttons button:hover {
+            background: #005fcc;
         }
         /* Секция инфо */
         .info-section {
@@ -196,6 +241,8 @@
             <a href="/">Главная</a>
             <a href="/analitic" class="active">Аналитика</a>
             <a href="/profile">Профиль</a>
+            <a href="/about" class="active">О авторе и проекте</a>
+            <a href="/support">Поддержка</a>
         </div>
     </nav>
 
@@ -206,9 +253,9 @@
             <div class="binance-badge">Данные предоставлены официальным API Binance</div>
         </header>
         <div class="period-switcher">
-            <a href="/analytics?days=7">7D</a>
-            <a href="/analytics?days=30">30D</a>
-            <a href="/analytics?days=90">90D</a>
+            <button class="period-btn" onclick="loadCharts(7)">7D</button>
+            <button class="period-btn" onclick="loadCharts(30)">30D</button>
+            <button class="period-btn" onclick="loadCharts(90)">90D</button>
         </div>
         <div class="charts-grid">
             <div class="chart-card">
@@ -217,7 +264,7 @@
                     Bitcoin / USDT
                 </div>
                 <div class="plot-area">
-                    <img src="/static/plots/{{ btc_file }}?{{ range(1,9999)|random }}" alt="BTC Plot">
+                    <canvas id="btcChart"></canvas>
                 </div>
             </div>
 
@@ -227,8 +274,14 @@
                     Ethereum / USDT
                 </div>
                 <div class="plot-area">
-                    <img src="/static/plots/{{ btc_file }}?{{ range(1,9999)|random }}" alt="BTC Plot">
+                    <canvas id="ethChart"></canvas> <!-- ETH -->
                 </div>
+            </div>
+            <div class="export-buttons">
+                <button onclick="downloadCSV('bitcoin')">Скачать BTC CSV</button>
+                <button onclick="downloadCSV('ethereum')">Скачать ETH CSV</button>
+                <button onclick="downloadJSON('bitcoin')">Скачать BTC JSON</button>
+                <button onclick="downloadJSON('ethereum')">Скачать ETH JSON</button>
             </div>
         </div>
 
@@ -249,4 +302,155 @@
     </div>
 
 </body>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let btcChart;
+let ethChart;
+
+async function fetchData(coin, days) {
+    try {
+        const response = await fetch(`/api/crypto?coin=${coin}&days=${days}`);
+
+        if (!response.ok) {
+            console.error("HTTP error:", response.status);
+            return null;
+        }
+
+        const result = await response.json();
+
+        if (!result.data) {
+            console.error("API error:", result);
+            return null;
+        }
+
+        return result;
+
+    } catch (err) {
+        console.error("Fetch error:", err);
+        return null;
+    }
+}
+let btcChartInstance = null;
+let ethChartInstance = null;
+
+async function loadCharts(days) {
+    try {
+        const btcData = await fetch(`/api/crypto?coin=bitcoin&days=${days}`).then(res => res.json());
+        const ethData = await fetch(`/api/crypto?coin=ethereum&days=${days}`).then(res => res.json());
+
+        if (btcData.error) {
+            console.error("BTC API error:", btcData.error);
+            return;
+        }
+
+        if (ethData.error) {
+            console.error("ETH API error:", ethData.error);
+            return;
+        }
+
+        // Удаляем старые графики, если есть
+        if (btcChartInstance) btcChartInstance.destroy();
+        if (ethChartInstance) ethChartInstance.destroy();
+
+        // BTC
+        const btcCtx = document.getElementById('btcChart').getContext('2d');
+        btcChartInstance = new Chart(btcCtx, {
+            type: 'line',
+            data: {
+                labels: btcData.data.map(d => d.date),
+                datasets: [{
+                    label: 'BTC / USD',
+                    data: btcData.data.map(d => d.price),
+                    borderColor: '#f7931a',
+                    fill: false,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // ETH
+        const ethCtx = document.getElementById('ethChart').getContext('2d');
+        ethChartInstance = new Chart(ethCtx, {
+            type: 'line',
+            data: {
+                labels: ethData.data.map(d => d.date),
+                datasets: [{
+                    label: 'ETH / USD',
+                    data: ethData.data.map(d => d.price),
+                    borderColor: '#627eea',
+                    fill: false,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+    } catch (e) {
+        console.error('Ошибка загрузки графиков:', e);
+    }
+}
+
+// Автозагрузка графиков на 7 дней при старте
+loadCharts(7);
+function downloadCSV(coin) {
+    let chartData = coin === 'bitcoin' ? btcChartInstance.data : ethChartInstance.data;
+
+    if (!chartData) {
+        alert("График ещё не загружен!");
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,Date,Price\n";
+
+    chartData.labels.forEach((label, i) => {
+        csvContent += `${label},${chartData.datasets[0].data[i]}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${coin}_data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+function downloadJSON(coin) {
+    let chartData = coin === 'bitcoin' ? btcChartInstance.data : ethChartInstance.data;
+
+    if (!chartData) {
+        alert("График ещё не загружен!");
+        return;
+    }
+
+    const jsonData = chartData.labels.map((label, i) => ({
+        date: label,
+        price: chartData.datasets[0].data[i]
+    }));
+
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {type : 'application/json'});
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${coin}_data.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+const periodButtons = document.querySelectorAll(".period-btn");
+
+periodButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        periodButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    });
+});
+</script>
 </html>

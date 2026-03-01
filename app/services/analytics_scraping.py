@@ -1,117 +1,84 @@
-import matplotlib
-matplotlib.use('Agg') # Фикс: запрещаем Matplotlib пытаться открыть окно на сервере
-import matplotlib.pyplot as plt
+
 import requests
 from datetime import datetime
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-import time
 import os
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
-templates = Jinja2Templates(directory="templates")
+# Папка для сохранения графиков
+PLOTS_DIR = "static/plots"
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
-CACHE = {}  # ключ = (coin_id, days), значение = (timestamp, filename)
+# Кэш для графиков
+PLOT_CACHE = {}
 CACHE_TTL = 300  # 5 минут
 
-def generate_crypto_plot(coin_id: str, filename: str, days: int = 7):
-    path = f"static/plots/{filename}"
-
+def fetch_coin_data(coin: str, days: int):
+    """
+    Получаем данные из CoinGecko для указанной монеты и периода.
+    Возвращаем список словарей с 'date' и 'price'.
+    """
+    link = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart"
+    params = {"vs_currency": "usd", "days": days, "interval": "daily"}
+    
     try:
-        link = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-        params = {"vs_currency": "usd", "days": days, "interval": "daily"}
         response = requests.get(link, params=params)
+        if response.status_code == 429:
+            raise Exception("Rate limit exceeded. Try again later.")
         response.raise_for_status()
-
         data = response.json()
+        
         if "prices" not in data:
-            print(f"[{coin_id}] Ошибка: в ответе API нет ключа 'prices': {data}")
-            return False
+            raise Exception(f"No 'prices' in API response for {coin} ({days} days)")
 
-        prices = data["prices"]
-        dates = [datetime.fromtimestamp(ts/1000) for ts, _ in prices]
-        values = [price for _, price in prices]
-
-        plt.figure(figsize=(8, 4))
-        plt.style.use("dark_background")
-        plt.plot(dates, values, linewidth=3, color="#007aff")
-        plt.title(f"{coin_id.capitalize()} Price ({days} Days)")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-
-        os.makedirs("static/plots", exist_ok=True)
-        plt.savefig(path, transparent=True, bbox_inches="tight")
-        plt.close()
-
-        return True
-
-    except requests.exceptions.RequestException as e:
-        print(f"[{coin_id}] Ошибка запроса к API: {e}")
-        return False
+        formatted = [
+            {"date": datetime.fromtimestamp(p[0]/1000).strftime("%d %b"), "price": p[1]}
+            for p in data["prices"]
+        ]
+        return formatted
     except Exception as e:
-        print(f"[{coin_id}] Другая ошибка при создании графика: {e}")
-        return False
+        print(f"[fetch_coin_data error] {e}")
+        return []
 
-def get_cached_plot(coin_id: str, days: int):
-    key = (coin_id, days)
-    now = time.time()
+def generate_crypto_plot(coin: str, days: int, filename: str):
+    """
+    Генерация PNG графика для монеты и сохранение в static/plots
+    """
+    key = (coin, days)
+    
+    # Используем кэш
+    if key in PLOT_CACHE:
+        return PLOT_CACHE[key]
 
-    # Проверяем кэш
-    if key in CACHE and now - CACHE[key][0] < CACHE_TTL:
-        return CACHE[key][1]
-
-    # Генерируем график
-    filename = f"{coin_id}_{days}d.png"
-    success = generate_crypto_plot(coin_id, filename, days)
-    if success:
-        CACHE[key] = (now, filename)
-        return filename
-    else:
+    data = fetch_coin_data(coin, days)
+    if not data:
         return None
 
-# def generate_crypto_plot(coin_id: str, filename: str, days: int):
-#     # 1. Парсинг данных
-#     link = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-#     params = {"vs_currency": "usd", "days": days, "interval": "daily"}
-#     path = f"static/plots/{filename}"
+    dates = [d["date"] for d in data]
+    prices = [d["price"] for d in data]
 
-#     try:
-#         response = requests.get(link, params=params)
-#         data = response.json()
-#         prices = data["prices"]
-        
-#         dates = []
-#         values = []
-#         for timestamp, price in prices:
-#             # Превращаем таймстамп в объект даты
-#             dates.append(datetime.fromtimestamp(timestamp / 1000))
-#             values.append(price)
+    plt.figure(figsize=(8,4))
+    plt.style.use('dark_background')
+    plt.plot(dates, prices, color="#007aff", linewidth=2)
+    plt.xticks(rotation=45)
+    plt.title(f"{coin.capitalize()} Price ({days}D)")
+    plt.tight_layout()
 
-#         # 2. Построение графика (теперь dates и values точно видны!)
-#         plt.figure(figsize=(8, 4))
-#         # Стилизация под Apple Dark Style
-#         plt.style.use('dark_background') 
-#         plt.plot(dates, values, color='#007aff', linewidth=3) 
-        
-#         # Делаем фон прозрачным
-#         plt.gcf().patch.set_alpha(0)
-#         plt.gca().patch.set_alpha(0)
-#         plt.tight_layout()
-#         plt.savefig(path, transparent=True, bbox_inches='tight')
+    path = os.path.join(PLOTS_DIR, filename)
+    plt.savefig(path, transparent=True)
+    plt.close()
 
-#         plt.title(f"{coin_id.capitalize()} Price ({days} Days)")
-#         plt.xticks(rotation=45)
-#         plt.tight_layout()
+    # Сохраняем в кэш
+    PLOT_CACHE[key] = filename
+    return filename
 
-#         # Проверяем папку
-#         os.makedirs("static/plots", exist_ok=True)
-        
-#         # 3. Сохранение
-#         plt.savefig(path, transparent=True, bbox_inches="tight")
-#         plt.close() # Важно для очистки памяти
-#         return True
-#     except Exception as e:
-#         print(f"Ошибка при создании графика: {e}")
-#         return False
-    
+def get_cached_plot(coin: str, days: int):
+    """
+    Возвращаем имя файла графика из кэша или создаем заново
+    """
+    filename = f"{coin}_{days}D.png"
+    full_path = os.path.join(PLOTS_DIR, filename)
+    if not os.path.exists(full_path):
+        generate_crypto_plot(coin, days, filename)
+    return filename

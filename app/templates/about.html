@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/png" href="/static/images/favicon.png?v=2">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обо мне | Dark Glass Portfolio</title>
@@ -127,6 +128,59 @@
             border-radius: 2px;
             margin-bottom: 30px;
         }
+        .project-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.2);
+            border-color: rgba(0, 122, 255, 0.3);
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-icon {
+            font-size: 24px;
+            background: rgba(0, 122, 255, 0.1);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .project-info-card h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .info-text {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .highlight {
+            display: block;
+            margin-top: 10px;
+            color: #007aff;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -134,17 +188,30 @@
     <nav class="navbar">
         <div class="nav-links">
             <a href="/">Главная</a>
-            <a href="/about" class="active">Обо мне</a>
+            <a href="/about" class="active">О авторе и проекте</a>
             <a href="/profile">Профиль</a>
+            <a href="/support">Поддержка</a>
         </div>
     </nav>
 
     <div class="content-wrapper">
+        <div class="project-info-card">
+            <div class="info-header">
+                <div class="info-icon">🛡️</div>
+                <h3>О проекте</h3>
+            </div>
+            <p class="info-text">
+                Это персональный инструмент для <strong>удобного анализа и сбора криптовалют</strong>. 
+                Система полностью интегрирована с вашим профилем: все данные защищены, а выбранные активы попадают в ваш личный список избранного. 
+                <span class="highlight">Ваш портфель — это только ваше пространство.</span>
+            </p>
+        </div>
         
         <section>
             <div class="accent-line"></div>
             <h1>Мне 18, и я создаю <br> веб сервисы.</h1>
-            <p>Я Backend-разработчик с опытом более <span class="highlight">одного года</span>. Пока мои сверстники спорили о выборе универа, я разбирался в том, как устроена архитектура высоконагруженных систем и почему Python — это не только про простоту, но и про огромную мощь.</p>
+            <p>Я Backend-разработчик с опытом более одного года. Пока мои сверстники спорили о выборе универа, я посадил сына вырастил дом и воспитал дерево.
+                Python — это не только про простоту, но и про огромную мощь.</p>
         </section>
 
         <section style="animation-delay: 0.2s;">

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 import os
 
 router = APIRouter()
@@ -25,5 +26,8 @@ def about(request: Request):
 
 
 @router.get("/support")
-def support():
-    return {"message": "Какая нахуй поддержка хах"}
+def support(request: Request):
+    return templates.TemplateResponse(
+        "404.html",
+        {"request": request}
+    )
