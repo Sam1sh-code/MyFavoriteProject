@@ -54,7 +54,8 @@ def get_user_from_db(username: str):
         return {
             "id": result.id,
             "username": result.username,
-            "hashed_password": result.hashed_password
+            "hashed_password": result.hashed_password,
+            "role" : result.role
         }
 
     return None

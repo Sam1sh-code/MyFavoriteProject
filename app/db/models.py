@@ -7,4 +7,5 @@ users = Table(
     Column("id", Integer, primary_key=True),
     Column("username", String, unique=True, index=True),
     Column("hashed_password", String),
+    Column("role", String, default="guest")
 )

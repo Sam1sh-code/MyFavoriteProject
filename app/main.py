@@ -4,7 +4,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import os
+from app.db.database import engine, metadata
+from app.db import models
 
+metadata.create_all(engine)
 
 app = FastAPI()
 

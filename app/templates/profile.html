@@ -209,7 +209,7 @@
         <aside class="profile-card">
             <div class="avatar">{{ user.username[0] if user else 'U' }}</div>
             <h2>{{ user.username if user else 'Гость' }}</h2>
-            <p>Статус: {{ user.status if user else 'В сети' }}</p>
+            <p>Статус: {{ user.role if user and user.role else 'user' }}</p>
             <a href="#" class="btn-edit">Настройки</a>
         </aside>
 
