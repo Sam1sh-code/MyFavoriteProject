@@ -59,3 +59,23 @@ def get_user_from_db(username: str):
         }
 
     return None
+
+def get_all_users_from_db():
+    """
+    Возвращает список всех пользователей из базы данных
+    """
+    conn = engine.connect()
+    query = select(users)  # без where — берем всех
+    results = conn.execute(query).fetchall()
+    conn.close()
+
+    all_users = []
+    for row in results:
+        all_users.append({
+            "id": row.id,
+            "username": row.username,
+            "hashed_password": row.hashed_password,
+            "role": row.role
+        })
+
+    return all_users

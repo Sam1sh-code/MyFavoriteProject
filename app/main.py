@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from app.routers import auth, pages, profile, analytics
+from app.routers import auth, pages, profile, analytics, admin
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -15,6 +15,7 @@ app.include_router(auth.router)
 app.include_router(pages.router)
 app.include_router(profile.router)
 app.include_router(analytics.router)
+app.include_router(admin.router)
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 templates = Jinja2Templates(directory=os.path.join(base_dir, "app/templates"))
@@ -32,3 +33,4 @@ async def custom_404_handler(request: Request, __):
     return templates.TemplateResponse("401.html", {
         "request": request
     }, status_code=401)
+
