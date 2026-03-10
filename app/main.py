@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from app.routers import auth, pages, profile, analytics, admin
+from app.routers import auth, pages, profile, analytics, admin, news
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -16,6 +16,7 @@ app.include_router(pages.router)
 app.include_router(profile.router)
 app.include_router(analytics.router)
 app.include_router(admin.router)
+app.include_router(news.router)
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 templates = Jinja2Templates(directory=os.path.join(base_dir, "app/templates"))
